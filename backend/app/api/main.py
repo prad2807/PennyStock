@@ -7,6 +7,7 @@ from datetime import date
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
+from app.config import DEFAULT_WEEKLY_ALLOCATION_INR
 from app.domain import HabitSaving, PortfolioEntry, Stock, StockMetrics
 from app.services.ai_insights import build_company_note_prompt
 from app.services.budget import BudgetState, clamp_monthly_limit
@@ -21,14 +22,14 @@ PORTFOLIO: list[PortfolioEntry] = []
 
 
 class HabitSavingRequest(BaseModel):
-    amount: int = Field(gt=0, le=1000)
+    amount: int = Field(gt=0, le=DEFAULT_WEEKLY_ALLOCATION_INR)
     reason: str = Field(min_length=2, max_length=160)
 
 
 class BuyEntryRequest(BaseModel):
     symbol: str
     buy_price: float = Field(gt=0)
-    amount: int = Field(gt=0, le=1000)
+    amount: int = Field(gt=0, le=DEFAULT_WEEKLY_ALLOCATION_INR)
     thesis: str
     catalyst: str
     why_selected: str
@@ -84,14 +85,24 @@ def add_habit_saving(payload: HabitSavingRequest) -> dict[str, object]:
 
 @app.post("/buy-entry")
 def add_buy_entry(payload: BuyEntryRequest) -> dict[str, object]:
-    monthly_invested = sum(entry.amount for entry in PORTFOLIO if entry.created_at.date().replace(day=1) == date.today().replace(day=1))
-    limit = clamp_monthly_limit(1000)
-    allowed = BudgetState(monthly_invested, limit).remaining_budget
+    monthly_invested = sum(
+        entry.amount
+        for entry in PORTFOLIO
+        if entry.created_at.date().replace(day=1) == date.today().replace(day=1)
+    )
+    limit = clamp_monthly_limit(None)
+    budget = BudgetState(monthly_invested, limit)
+    allowed = min(budget.remaining_budget, budget.weekly_recommendation_limit)
     amount = min(payload.amount, allowed)
     entry = PortfolioEntry(**payload.model_dump(), amount=amount)
     if amount > 0:
         PORTFOLIO.append(entry)
-    return {"accepted_amount": amount, "remaining_monthly_budget": BudgetState(monthly_invested + amount, limit).remaining_budget, "entry": entry if amount > 0 else None}
+    return {
+        "accepted_amount": amount,
+        "remaining_monthly_budget": BudgetState(monthly_invested + amount, limit).remaining_budget,
+        "weekly_recommendation_limit": budget.weekly_recommendation_limit,
+        "entry": entry if amount > 0 else None,
+    }
 
 
 @app.get("/stock/{symbol}")

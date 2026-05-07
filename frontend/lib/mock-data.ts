@@ -1,16 +1,17 @@
 import type { DashboardState } from "./types";
 
 export const dashboardState: DashboardState = {
-  monthlyLimit: 1000,
-  monthlyInvested: 700,
-  investmentPool: 840,
+  monthlyLimit: 4000,
+  monthlyInvested: 2700,
+  weeklyRecommendationLimit: 1000,
+  investmentPool: 3400,
   mode: "active",
   recommendations: [
     {
       symbol: "PIXTRANS",
       companyName: "Pix Transmissions",
       action: "Buy",
-      allocationAmount: 250,
+      allocationAmount: 1000,
       convictionScore: 78.4,
       reasons: [
         "Improving revenue growth with conservative leverage",

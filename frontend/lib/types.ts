@@ -12,6 +12,7 @@ export interface WeeklyRecommendation {
 export interface DashboardState {
   monthlyLimit: number;
   monthlyInvested: number;
+  weeklyRecommendationLimit: number;
   investmentPool: number;
   mode: "active" | "watchlist_only";
   message?: string;

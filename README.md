@@ -4,9 +4,16 @@ A disciplined, AI-assisted research platform for Indian small-cap and micro-cap 
 
 ## Core rule
 
-The monthly experimental allocation is hard-capped at **₹1000**. When the user reaches the cap, buy recommendations are disabled and the platform moves to watchlist-only mode with the message:
+The monthly experimental allocation is hard-capped at **₹4000**. Weekly recommendations are separately capped at **₹1000 total per week**, split across one or two ideas when two fresh buys are valid. When the user reaches the monthly cap, buy recommendations are disabled and the platform moves to watchlist-only mode with the message:
 
 > Monthly experimental allocation limit reached
+
+## Allocation limits
+
+- **Monthly cap:** ₹4000 total experimental investment allocation.
+- **Weekly cap:** ₹1000 total buy recommendation allocation.
+- If less than ₹1000 remains in the month, the weekly cap automatically becomes the remaining monthly budget.
+- When ₹4000 has already been invested in the current month, new buys are blocked and recommendations switch to watchlist-only mode.
 
 ## Architecture
 
@@ -20,7 +27,7 @@ The monthly experimental allocation is hard-capped at **₹1000**. When the user
 
 1. Screener and stock universe filters
 2. Scoring engine for hidden growth, momentum, quality, and risk
-3. Weekly recommendation engine with 1–2 stock maximum
+3. Weekly recommendation engine with 1–2 stock maximum and ₹1000 total weekly allocation cap
 4. Budget enforcement and habit savings
 5. Portfolio and journal tracking contracts
 6. AI insight layer interface

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from app.config import MAX_WEEKLY_FRESH_BUYS
+from app.config import DEFAULT_WEEKLY_ALLOCATION_INR, MAX_WEEKLY_FRESH_BUYS
 from app.domain import Recommendation, RecommendationAction, RecommendationMode, Stock, StockScore
 from app.services.budget import BudgetState, weekly_allocation
 
@@ -62,11 +62,19 @@ def generate_weekly_recommendations(
             "mode": budget.mode,
             "message": budget.message,
             "remaining_monthly_budget": budget.remaining_budget,
+            "weekly_recommendation_limit": budget.weekly_recommendation_limit,
             "recommendations": [],
             "watchlist": [stock.symbol for stock in ranked[:10]],
         }
 
     fresh_buys = 0
+    weekly_remaining = budget.weekly_recommendation_limit
+    buy_candidates = [
+        stock for stock in ranked if action_for_score(scores[stock.symbol]) == RecommendationAction.BUY
+    ]
+    buy_slots = min(len(buy_candidates), MAX_WEEKLY_FRESH_BUYS) or 1
+    target_buy_allocation = max(weekly_remaining // buy_slots, 0)
+
     for stock in ranked:
         score = scores[stock.symbol]
         action = action_for_score(score)
@@ -77,9 +85,14 @@ def generate_weekly_recommendations(
             fresh_buys += 1
         if action not in {RecommendationAction.BUY, RecommendationAction.HOLD}:
             continue
-        allocation = weekly_allocation(250, budget) if action == RecommendationAction.BUY else 0
-        if action == RecommendationAction.BUY and allocation <= 0:
-            continue
+        allocation = 0
+        if action == RecommendationAction.BUY:
+            allocation = weekly_allocation(
+                target_buy_allocation or DEFAULT_WEEKLY_ALLOCATION_INR, budget, weekly_remaining
+            )
+            if allocation <= 0:
+                continue
+            weekly_remaining -= allocation
         recommendations.append(
             Recommendation(
                 symbol=stock.symbol,
@@ -99,6 +112,7 @@ def generate_weekly_recommendations(
             "mode": RecommendationMode.WATCHLIST_ONLY,
             "message": NO_OPPORTUNITY_MESSAGE,
             "remaining_monthly_budget": budget.remaining_budget,
+            "weekly_recommendation_limit": budget.weekly_recommendation_limit,
             "recommendations": [],
             "watchlist": [stock.symbol for stock in ranked[:10]],
         }
@@ -107,6 +121,7 @@ def generate_weekly_recommendations(
         "mode": RecommendationMode.ACTIVE,
         "message": None,
         "remaining_monthly_budget": budget.remaining_budget,
+        "weekly_recommendation_limit": budget.weekly_recommendation_limit,
         "recommendations": recommendations,
         "watchlist": [stock.symbol for stock in ranked if stock.symbol not in {r.symbol for r in recommendations}][:10],
     }

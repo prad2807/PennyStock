@@ -19,13 +19,15 @@ export default function HomePage() {
           </div>
           <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-amber-100">
             <p className="text-sm uppercase tracking-[0.25em]">Hard cap</p>
-            <p className="mt-1 text-3xl font-bold">₹1000/month</p>
+            <p className="mt-1 text-3xl font-bold">₹4000/month</p>
+            <p className="mt-1 text-sm">₹1000 total weekly recommendation cap</p>
           </div>
         </header>
 
-        <section className="mt-8 grid gap-4 md:grid-cols-4">
+        <section className="mt-8 grid gap-4 md:grid-cols-5">
           <StatCard label="Budget used" value={`₹${dashboardState.monthlyInvested}`} helper={`${usagePercent}% of monthly cap consumed`} />
-          <StatCard label="Remaining" value={`₹${remaining}`} helper="Recommendations cannot exceed this" />
+          <StatCard label="Remaining" value={`₹${remaining}`} helper="Monthly recommendation room" />
+          <StatCard label="Weekly cap" value={`₹${dashboardState.weeklyRecommendationLimit}`} helper="Total buy allocation this week" />
           <StatCard label="Investment pool" value={`₹${dashboardState.investmentPool}`} helper="From skipped impulsive spending" />
           <StatCard label="Active positions" value="5 max" helper="Prevents overdiversification and churn" />
         </section>
