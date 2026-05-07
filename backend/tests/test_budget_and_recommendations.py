@@ -1,5 +1,6 @@
 from datetime import date
 
+from app.config import DEFAULT_WEEKLY_ALLOCATION_INR, MONTHLY_INVESTMENT_LIMIT_INR
 from app.domain import Stock, StockScore
 from app.services.budget import BudgetState, CAP_REACHED_MESSAGE, clamp_monthly_limit, weekly_allocation
 from app.services.recommendations import NO_OPPORTUNITY_MESSAGE, generate_weekly_recommendations
@@ -11,6 +12,11 @@ def stock(symbol="ALPHA"):
 
 def score(symbol="ALPHA", conviction=80, risk=10):
     return StockScore(symbol, 80, 75, 80, risk, conviction)
+
+
+def test_configured_caps_are_4000_monthly_and_1000_weekly():
+    assert MONTHLY_INVESTMENT_LIMIT_INR == 4000
+    assert DEFAULT_WEEKLY_ALLOCATION_INR == 1000
 
 
 def test_monthly_limit_is_clamped_to_4000():

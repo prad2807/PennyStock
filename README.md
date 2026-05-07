@@ -8,6 +8,13 @@ The monthly experimental allocation is hard-capped at **₹4000**. Weekly recomm
 
 > Monthly experimental allocation limit reached
 
+## Allocation limits
+
+- **Monthly cap:** ₹4000 total experimental investment allocation.
+- **Weekly cap:** ₹1000 total buy recommendation allocation.
+- If less than ₹1000 remains in the month, the weekly cap automatically becomes the remaining monthly budget.
+- When ₹4000 has already been invested in the current month, new buys are blocked and recommendations switch to watchlist-only mode.
+
 ## Architecture
 
 - **Frontend:** Next.js, TypeScript, Tailwind, Recharts-ready structure

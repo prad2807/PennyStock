@@ -22,7 +22,7 @@ PORTFOLIO: list[PortfolioEntry] = []
 
 
 class HabitSavingRequest(BaseModel):
-    amount: int = Field(gt=0, le=1000)
+    amount: int = Field(gt=0, le=DEFAULT_WEEKLY_ALLOCATION_INR)
     reason: str = Field(min_length=2, max_length=160)
 
 
